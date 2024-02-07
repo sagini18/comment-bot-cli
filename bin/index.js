@@ -50,14 +50,14 @@ program
       });
   });
 
-  // CLI command to add comment to a pull request
+// CLI command to add comment to a pull request
 program
   .command("addComment <repo> <pr> <comment>")
   .alias("ac")
   .description("Add a comment to a pull request.")
   .action(async (repo, pr, comment) => {
     axios
-      .post(`http://localhost:5000/pull-request/comment`, {repo, pr, comment})
+      .post(`http://localhost:5000/pull-request/comment`, { repo, pr, comment })
       .then((response) => {
         console.log(response.data);
       })
