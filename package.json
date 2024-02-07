@@ -1,0 +1,25 @@
+{
+  "name": "prcommentorcli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cli"
+  ],
+  "bin": {
+    "prc": "./bin/index.js"
+  },
+  "author": "sagini navaratnam",
+  "license": "ISC",
+  "dependencies": {
+    "@octokit/rest": "^20.0.2",
+    "axios": "^1.6.7",
+    "commander": "^12.0.0",
+    "open": "^10.0.3",
+    "yargs": "^17.7.2"
+  }
+}
