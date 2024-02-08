@@ -1,6 +1,6 @@
 {
   "name": "prcommentorcli",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "main": "bin/index.js",
   "type": "module",
@@ -8,7 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "cli"
+    "cli",
+    "prc",
+    "pr"
   ],
   "bin": {
     "prc": "./bin/index.js"
@@ -19,7 +21,10 @@
     "@octokit/rest": "^20.0.2",
     "axios": "^1.6.7",
     "commander": "^12.0.0",
-    "open": "^10.0.3",
-    "yargs": "^17.7.2"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "octokit": "^3.1.2",
+    "open": "^10.0.3"
   }
 }
