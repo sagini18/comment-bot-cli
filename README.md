@@ -10,7 +10,9 @@ prcommentorcli is a command-line interface (CLI) tool that facilitates self-serv
 ## Installation
 To install prcommentorcli, use npm:
 
-`npm install -g prcommentorcli`
+```bash
+npm install -g prcommentorcli
+```
 
 ## Usage
 
@@ -29,17 +31,19 @@ Options:
 
 ## Examples
 
+```bash
 # Install the GitHub app on selected repositories
-`prc -i`
+prc -i
 
 # List repositories accessible to the bot
-`prc -lr`
+prc -lr
 
 # List pull requests in a specified repository
-`prc -lpr repo-name`
+prc -lpr repo-name
 
 # Add a comment to a pull request
-`prc -ac repo-name pr-number "comment contents"`
+prc -ac repo-name pr-number "comment contents"
+```
 
 
 ## Contact
