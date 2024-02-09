@@ -15,7 +15,11 @@ const listOfRepositories = () => {
       });
     })
     .catch((error) => {
-      console.log(error.response?.data?.message);
+      if (error.response?.status === 401) {
+        console.log("Invalid token. Please install the bot again.");
+      } else {
+        console.log(error.response?.data?.message);
+      }
     });
 };
 

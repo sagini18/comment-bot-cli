@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const addComment = () => {
+export const reopenPullRequest = () => {
   const token = readTokenFromFile();
   axios
     .get("https://api.github.com/user", {
@@ -16,25 +16,25 @@ export const addComment = () => {
         auth: token,
       });
       await octokit
-        ?.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
+        ?.request("PATCH /repos/{owner}/{repo}/pulls/{pull_number}", {
           owner: owner,
           repo: process?.argv?.[3],
-          issue_number: process?.argv?.[4],
-          body: process?.argv?.[5],
+          pull_number: process?.argv?.[4],
+          state: "open",
+          headers: {
+            'X-GitHub-Api-Version': '2022-11-28'
+          }
         })
         .then((response) => {
-          console.log("Comment added successfully");
-          console.log("View the comment at:")
+          console.log("Pull Request reopened successfully");
+          console.log("View the pull request at:");
           console.log(response.data?.html_url);
         })
         .catch((error) => {
-           if (error.response?.status === 401) {
+          if (error.response?.status === 401) {
             console.log("Invalid token. Please install the bot again.");
           }
           console.log(error.response?.data?.message);
         });
-    })
-    .catch((error) => {
-      console.log(error.response?.data?.message);
     });
 };

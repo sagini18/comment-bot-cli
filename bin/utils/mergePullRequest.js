@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const addComment = () => {
+export const mergePullRequest = () => {
   const token = readTokenFromFile();
   axios
     .get("https://api.github.com/user", {
@@ -16,25 +16,22 @@ export const addComment = () => {
         auth: token,
       });
       await octokit
-        ?.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
+        ?.request("PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge", {
           owner: owner,
           repo: process?.argv?.[3],
-          issue_number: process?.argv?.[4],
-          body: process?.argv?.[5],
+          pull_number: process?.argv?.[4],
+          headers: {
+            'X-GitHub-Api-Version': '2022-11-28'
+          }
         })
         .then((response) => {
-          console.log("Comment added successfully");
-          console.log("View the comment at:")
-          console.log(response.data?.html_url);
+          console.log("Pull Request merged successfully");
         })
         .catch((error) => {
-           if (error.response?.status === 401) {
+          if (error.response?.status === 401) {
             console.log("Invalid token. Please install the bot again.");
           }
           console.log(error.response?.data?.message);
         });
-    })
-    .catch((error) => {
-      console.log(error.response?.data?.message);
     });
 };

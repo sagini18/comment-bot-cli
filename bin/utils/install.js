@@ -37,7 +37,7 @@ const install = () => {
         );
         if (serverInstance) {
           serverInstance.close();
-        } 
+        }
       })
       .catch((error) => {
         console.log(error.response?.data?.message);
@@ -47,13 +47,11 @@ const install = () => {
 
 // Function to save token to a file
 function saveTokenToFile(token) {
-    fs.writeFileSync('token.txt', token, 'utf-8');
+  fs.writeFileSync("token.txt", token, "utf-8");
 }
 // Function to read token from file
 function readTokenFromFile() {
-    return fs.readFileSync('token.txt', 'utf-8');
+  return fs.readFileSync("token.txt", "utf-8");
 }
 
-
-
-export { install,readTokenFromFile};
+export { install, readTokenFromFile };
