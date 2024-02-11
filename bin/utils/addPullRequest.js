@@ -2,42 +2,48 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const addPullRequest = (repo, title, body, head, base) => {
+async function addPullRequest(repo, title, body, head, base) {
   const token = readTokenFromFile();
-  axios
-    .get("https://api.github.com/user", {
-      headers: {
-        Authorization: `token ${token}`,
-      },
-    })
-    .then(async (response) => {
-      const owner = response.data?.login;
+  if (!token) {
+    console.log("Token not found. Please install the bot first.");
+    return;
+  }
 
-      const octokit = new Octokit({
-        auth: token,
-      });
-      await octokit
-        ?.request("POST /repos/{owner}/{repo}/pulls", {
-          owner,
-          repo,
-          title,
-          body,
-          head,
-          base,
-        })
-        .then((response) => {
-          console.log("Pull Request added successfully");
-          console.log("View the pull request at:");
-          console.log(response.data?.html_url);
-        })
-        .catch((error) => {
-          if (error.response?.status === 401) {
-            console.log("Invalid token. Please install the bot again.");
-          } else if (error.response?.status === 422) {
-            console.log(error.response?.data?.errors[0]?.message);
-          } else {
-            console.log(error.response?.data?.message);
-          }
-        });
-    });
-};
+  const userData = await axios.get("https://api.github.com/user", {
+    headers: {
+      Authorization: `token ${token}`,
+    },
+  });
+  if (userData.status != 200) {
+    console.log("Something went wrong in fetching user data.");
+    return;
+  }
+  const owner = userData.data?.login;
+
+  const octokit = new Octokit({
+    auth: token,
+  });
+
+  const addprResponse = await octokit?.request(
+    "POST /repos/{owner}/{repo}/pulls",
+    {
+      owner,
+      repo,
+      title,
+      body,
+      head,
+      base,
+    }
+  );
+  if (addprResponse.status != 201) {
+    console.log("Something went wrong in adding pull request.");
+    return;
+  }
+
+  console.log(
+    "Pull Request added successfully\nView the pull request at:\n",
+    addprResponse.data.html_url
+  );
+}
+
+export { addPullRequest };
