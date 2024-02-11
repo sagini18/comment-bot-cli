@@ -13,15 +13,18 @@ async function listOfRepositories() {
       Authorization: `token ${token}`,
     },
   });
+  if (repoResponse.status === 401) {
+    console.log("Invalid token. Please install the bot again.");
+    return;
+  }else if (!repoResponse) {
+    console.log("Something went wrong in fetching the repositories.")
+    return;
+  }
 
   repoResponse.data.forEach((element) => {
     console.log(element.name);
   });
 
-  if (repoResponse.status === 401) {
-    console.log("Invalid token. Please install the bot again.");
-    return;
-  }
 }
 
 export { listOfRepositories };

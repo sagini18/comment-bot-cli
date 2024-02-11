@@ -13,6 +13,10 @@ const listOfPullRequest = async (repo) => {
       Authorization: `token ${token}`,
     },
   });
+  if (!userData) {
+    console.log("User not found. Please install the bot first.");
+    return;
+  }
   const owner = userData.data?.login;
 
   const octokit = new Octokit({
