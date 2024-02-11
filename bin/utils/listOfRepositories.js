@@ -8,17 +8,17 @@ async function listOfRepositories() {
     return;
   }
 
-  const response = await axios.get("https://api.github.com/user/repos", {
+  const repoResponse = await axios.get("https://api.github.com/user/repos", {
     headers: {
       Authorization: `token ${token}`,
     },
   });
 
-  response.data.forEach((element) => {
+  repoResponse.data.forEach((element) => {
     console.log(element.name);
   });
 
-  if (response.status === 401) {
+  if (repoResponse.status === 401) {
     console.log("Invalid token. Please install the bot again.");
     return;
   }

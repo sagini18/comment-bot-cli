@@ -4,55 +4,49 @@ import { readTokenFromFile } from "./install.js";
 
 const listOfPullRequest = async (repo) => {
   const token = readTokenFromFile();
-  axios
-    .get("https://api.github.com/user", {
+  if (!token) {
+    console.log("Token not found. Please install the bot first.");
+    return;
+  }
+  const userData = await axios.get("https://api.github.com/user", {
+    headers: {
+      Authorization: `token ${token}`,
+    },
+  });
+  const owner = userData.data?.login;
+
+  const octokit = new Octokit({
+    auth: token,
+  });
+
+  const pullRequestData = await octokit?.request(
+    "GET /repos/{owner}/{repo}/pulls",
+    {
+      owner,
+      repo,
       headers: {
-        Authorization: `token ${token}`,
+        "X-GitHub-Api-Version": "2022-11-28",
       },
-    })
-    .then(async (response) => {
-      const owner = response.data?.login;
-      const octokit = new Octokit({
-        auth: token,
-      });
-      await octokit
-        ?.request("GET /repos/{owner}/{repo}/pulls", {
-          owner: owner,
-          repo: repo,
-          headers: {
-            "X-GitHub-Api-Version": "2022-11-28",
-          },
-        })
-        .then((response) => {
-          if (response?.data?.length === 0) {
-            console.log("No pull requests found");
-          } else {
-            var pullRequestData = [];
-            response.data?.forEach((element) => {
-              pullRequestData.push({
-                title: element.title,
-                number: element.number,
-                body: element.body,
-              });
-            });
-            console.table(pullRequestData);
-          }
-        })
-        .catch((error) => {
-          if (error.response?.status === 401) {
-            console.log("Invalid token. Please install the bot again.");
-          } else {
-            console.log(error.response?.data?.message);
-          }
-        });
-    })
-    .catch((error) => {
-      if (error.response?.status === 401) {
-        console.log("Invalid token. Please install the bot again.");
-      } else {
-        console.log(error.response?.data?.message);
-      }
+    }
+  );
+  if (pullRequestData?.data?.length === 0) {
+    console.log("No pull requests found");
+    return;
+  }
+  var pullRequestDataArray = [];
+  pullRequestData.data?.forEach((element) => {
+    pullRequestDataArray.push({
+      title: element.title,
+      number: element.number,
+      body: element.body,
     });
+  });
+  console.table(pullRequestDataArray);
+
+  if (pullRequestData.status === 401 || userData.status === 401) {
+    console.log("Invalid token. Please install the bot again.");
+    return;
+  }
 };
 
 export { listOfPullRequest };
