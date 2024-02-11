@@ -36,7 +36,7 @@ const listOfPullRequest = async (repo) => {
   if (pullRequestData.status === 401 || userData.status === 401) {
     console.log("Invalid token. Please install the bot again.");
     return;
-  }else if(pullRequestData.status !== 200){
+  }else if(pullRequestData.status != 200){
     console.log("Something went wrong in fetching the pull requests.");
     return; 
   }
