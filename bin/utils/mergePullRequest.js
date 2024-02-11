@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const mergePullRequest = () => {
+export const mergePullRequest = (repo, pr) => {
   const token = readTokenFromFile();
   axios
     .get("https://api.github.com/user", {
@@ -18,8 +18,8 @@ export const mergePullRequest = () => {
       await octokit
         ?.request("PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge", {
           owner: owner,
-          repo: process?.argv?.[3],
-          pull_number: process?.argv?.[4],
+          repo: repo,
+          pull_number: pr,
           headers: {
             'X-GitHub-Api-Version': '2022-11-28'
           }

@@ -2,7 +2,12 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const addComment = () => {
+export const addComment = (repo,pr, comment) => {
+  console.log("Adding comment to the pull request:");
+  console.log(pr);
+  console.log("Comment:");
+  console.log(comment);
+  console.log(repo);
   const token = readTokenFromFile();
   axios
     .get("https://api.github.com/user", {
@@ -18,9 +23,9 @@ export const addComment = () => {
       await octokit
         ?.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
           owner: owner,
-          repo: process?.argv?.[3],
-          issue_number: process?.argv?.[4],
-          body: process?.argv?.[5],
+          repo: repo,
+          issue_number: pr,
+          body: comment,
         })
         .then((response) => {
           console.log("Comment added successfully");

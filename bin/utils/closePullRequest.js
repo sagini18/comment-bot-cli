@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const closePullRequest = () => {
+export const closePullRequest = (repo,pr) => {
     const token = readTokenFromFile();
     axios
         .get("https://api.github.com/user", {
@@ -17,9 +17,9 @@ export const closePullRequest = () => {
         });
         await octokit
             ?.request("PATCH /repos/{owner}/{repo}/pulls/{pull_number}", {
-            owner: owner,
-            repo: process?.argv?.[3],
-            pull_number: process?.argv?.[4],
+            owner,
+            repo,
+            pull_number: pr,
             state: "closed",
             })
             .then((response) => {

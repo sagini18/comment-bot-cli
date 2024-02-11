@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const reopenPullRequest = () => {
+export const reopenPullRequest = (repo, pr) => {
   const token = readTokenFromFile();
   axios
     .get("https://api.github.com/user", {
@@ -17,9 +17,9 @@ export const reopenPullRequest = () => {
       });
       await octokit
         ?.request("PATCH /repos/{owner}/{repo}/pulls/{pull_number}", {
-          owner: owner,
-          repo: process?.argv?.[3],
-          pull_number: process?.argv?.[4],
+          owner,
+          repo,
+          pull_number: pr,
           state: "open",
           headers: {
             'X-GitHub-Api-Version': '2022-11-28'

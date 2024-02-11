@@ -2,54 +2,87 @@ import axios from "axios";
 import express from "express";
 import open from "open";
 import fs from "fs";
-// import dotenv from "dotenv";
+
 const app = express();
-let token;
 let serverInstance;
 
-const install = () => {
-  serverInstance = app.listen(5000);
-  const installURL =
-    "https://github.com/login/oauth/authorize?client_id=Iv1.aa3cb26d1819b071&redirect_uri=http://localhost:5000/github-app/callback&scope=repo";
+function install() {
+  createServer();
+  const installURL = `https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URL}&scope=${process.env.SCOPE}`;
   open(installURL);
   console.log(`Opening ${installURL} in your default web browser.`);
+  authorization();
+}
 
-  app.get("/github-app/callback", (req, res) => {
+async function createServer() {
+  const port = await getRandomPort();
+  serverInstance = app.listen(port);
+}
+
+async function getRandomPort() {
+  //if the port 5000 is using it should be incremented by 1
+  let port = 5000;
+
+  while (port) {
+    const portTaken = await isPortTaken(port);
+    if (portTaken) {
+      port++;
+    } else {
+      return port;
+    }
+  }
+}
+
+async function isPortTaken(port) {
+  return new Promise((resolve) => {
+    const server = app.listen(port, () => {
+      server.close(() => {
+        resolve(false); // Port is available
+      });
+    });
+
+    server.on("error", (err) => {
+      err.code === "EADDRINUSE" ? resolve(true) : resolve(false);
+    });
+  });
+}
+
+function authorization() {
+  app.get("/github-app/callback", async (req, res) => {
     const code = req?.query?.code;
-    const tokenURL = `https://github.com/login/oauth/access_token?client_id=Iv1.aa3cb26d1819b071&client_secret=182996c6b2fd80a82b304bc6ca74881ea05c065a&code=${code}`;
-    axios
-      .post(tokenURL, null, {
+    if (!code) {
+      console.log("Code not found");
+      return;
+    }
+
+    const tokenURL = `https://github.com/login/oauth/access_token`;
+    const oauthResponse = await axios.post(
+      tokenURL,
+      {
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        code: code,
+      },
+      {
         headers: {
           accept: "application/json",
         },
-      })
-      .then((response) => {
-        token = response.data?.access_token;
-        // dotenv.populate(process.env, { TOKEN: token }, { override: true });
-        // console.log("Token added to .env file", process.env.TOKEN);
-        saveTokenToFile(token);
+      }
+    );
 
-        if (token === undefined) {
-          console.log("Token not found");
-        }
-        res.redirect(
-          "https://github.com/apps/pr-comment-on-build/installations/new"
-        );
-        if (serverInstance) {
-          serverInstance.close();
-        }
-      })
-      .catch((error) => {
-        console.log(error.response?.data?.message);
-      });
+    if (oauthResponse.data?.access_token) {
+      saveTokenToFile(oauthResponse.data.access_token);
+      res.redirect(process.env.AFTER_AUTHORIZED_REDIRECT_URL);
+      serverInstance.close();
+    } else {
+      console.log("Token not found");
+      return;
+    }
   });
-};
-
-// Function to save token to a file
+}
 function saveTokenToFile(token) {
   fs.writeFileSync("token.txt", token, "utf-8");
 }
-// Function to read token from file
 function readTokenFromFile() {
   return fs.readFileSync("token.txt", "utf-8");
 }

@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const addPullRequest = () => {
+export const addPullRequest = (repo, title, body, head, base) => {
   const token = readTokenFromFile();
   axios
     .get("https://api.github.com/user", {
@@ -18,12 +18,12 @@ export const addPullRequest = () => {
       });
       await octokit
         ?.request("POST /repos/{owner}/{repo}/pulls", {
-          owner: owner,
-          repo: process?.argv?.[3],
-          title: process?.argv?.[4],
-          body: process?.argv?.[5],
-          head: process?.argv?.[6],
-          base: process?.argv?.[7],
+          owner,
+          repo,
+          title,
+          body,
+          head,
+          base,
         })
         .then((response) => {
           console.log("Pull Request added successfully");
@@ -33,9 +33,9 @@ export const addPullRequest = () => {
         .catch((error) => {
           if (error.response?.status === 401) {
             console.log("Invalid token. Please install the bot again.");
-          }else if (error.response?.status === 422) {
+          } else if (error.response?.status === 422) {
             console.log(error.response?.data?.errors[0]?.message);
-          }else {
+          } else {
             console.log(error.response?.data?.message);
           }
         });

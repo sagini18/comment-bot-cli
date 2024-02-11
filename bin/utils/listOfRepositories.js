@@ -3,6 +3,11 @@ import axios from "axios";
 
 const listOfRepositories = () => {
   const token = readTokenFromFile();
+  if (!token) {
+    console.log("Token not found. Please install the bot first.");
+    return;
+  }
+  
   axios
     .get("https://api.github.com/user/repos", {
       headers: {

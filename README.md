@@ -23,47 +23,46 @@ npm install -g prcommentorcli
 
 After installation, you can use the CLI with the following options:
 
-
-prcommentorcli [options]
-
 Options:
+  -h, --help            display help for command
 
-- -i, --install                                               Install the bot
-- -lr, --listOfRepositories                                   List all the repositories in the current organization.
-- -lpr, --listOfPullRequest <repo>                            List all the pull requests in the current repository.
-- -ac, --addComment <repo> <pr> <comment>                     Add a comment to a pull request.
-- -apr, --addPullRequest <repo> <title> <body> <head> <base>  Add a pull request.
-- -cpr, --closePullRequest <repo> <pr>                        Close a pull request.
-- -mpr, --mergePullRequest <repo> <pr>                        Merge a pull request.
-- -rpr,-reopenPullRequest <repo> <pr>                         Reopen a pull request.
-- -h, --help                                                  display help for command
+Commands:
+  install               Install the bot
+  listofrepo            List all the repositories in the current organization.
+  listofpr <repo>       List all the pull requests in the current repository.
+  addcomment [options]  Add a comment to a pull request.
+  addpr [options]       Add a pull request to a repository
+  closepr [options]     Close a pull request.
+  mergepr [options]     Merge a pull request.
+  reopenpr [options]    Reopen a pull request.
+  help [command]        display help for command
 
 ## Examples
 
 ```bash
 # Install the GitHub app on selected repositories
-prc -i
+prc install
 
 # List repositories accessible to the bot
-prc -lr
+prc listofrepo 
 
 # List pull requests in a specified repository
-prc -lpr repo-name
+prc listofpr repo-name
 
 # Add a comment to a pull request
-prc -ac repo-name pr-number "comment contents"
+prc addcomment -r repo-name -p pr-number -c "comment contents"
 
 # Add a pull request to a specified repository
-prc -apr repo-name "pull request title" "pull request body" "head branch" "base branch"
+prc addpr -r repo-name -t "pull request title" -bo "pull request body" -he "head branch" -ba "base branch"
 
 # Close a pull request on a specified repository
-prc -cpr repo-name pr-number
+prc closepr -r repo-name -p pr-number
 
 # Reopen a pull request on a specified repository
-prc -rpr repo-name pr-number
+prc reopenpr -r repo-name -p pr-number
 
 # Merge a pull request on a specified repository
-prc -mpr repo-name pr-number
+prc mergepr -r repo-name -p pr-number
 ```
 
 
