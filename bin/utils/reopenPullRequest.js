@@ -2,39 +2,47 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const reopenPullRequest = (repo, pr) => {
+async function reopenPullRequest(repo, pr) {
   const token = readTokenFromFile();
-  axios
-    .get("https://api.github.com/user", {
+  if (!token) {
+    console.log("Token not found. Please install the bot first.");
+    return;
+  }
+  const userData = await axios.get("https://api.github.com/user", {
+    headers: {
+      Authorization: `token ${token}`,
+    },
+  });
+  if (userData.status != 200) {
+    console.log("Something went wrong in fetching user data.");
+    return;
+  }
+  const owner = userData.data?.login;
+
+  const octokit = new Octokit({
+    auth: token,
+  });
+  const reopenResponse = await octokit?.request(
+    "PATCH /repos/{owner}/{repo}/pulls/{pull_number}",
+    {
+      owner,
+      repo,
+      pull_number: pr,
+      state: "open",
       headers: {
-        Authorization: `token ${token}`,
+        "X-GitHub-Api-Version": "2022-11-28",
       },
-    })
-    .then(async (response) => {
-      const owner = response.data?.login;
-      const octokit = new Octokit({
-        auth: token,
-      });
-      await octokit
-        ?.request("PATCH /repos/{owner}/{repo}/pulls/{pull_number}", {
-          owner,
-          repo,
-          pull_number: pr,
-          state: "open",
-          headers: {
-            'X-GitHub-Api-Version': '2022-11-28'
-          }
-        })
-        .then((response) => {
-          console.log("Pull Request reopened successfully");
-          console.log("View the pull request at:");
-          console.log(response.data?.html_url);
-        })
-        .catch((error) => {
-          if (error.response?.status === 401) {
-            console.log("Invalid token. Please install the bot again.");
-          }
-          console.log(error.response?.data?.message);
-        });
-    });
-};
+    }
+  );
+  if (reopenResponse.status != 200) {
+    console.log("Something went wrong in reopening pull request.");
+    return;
+  }
+
+  console.log(
+    "Pull Request reopened successfully\nView the pull request at:\n",
+    reopenResponse.data.html_url
+  );
+}
+
+export { reopenPullRequest };

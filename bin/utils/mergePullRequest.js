@@ -2,36 +2,43 @@ import { Octokit } from "@octokit/rest";
 import axios from "axios";
 import { readTokenFromFile } from "./install.js";
 
-export const mergePullRequest = (repo, pr) => {
+async function mergePullRequest(repo, pr) {
   const token = readTokenFromFile();
-  axios
-    .get("https://api.github.com/user", {
+  if (!token) {
+    console.log("Token not found. Please install the bot first.");
+    return;
+  }
+
+  const userData = await axios.get("https://api.github.com/user", {
+    headers: {
+      Authorization: `token ${token}`,
+    },
+  });
+  if (userData.status != 200) {
+    console.log("Something went wrong in fetching user data.");
+    return;
+  }
+  const owner = userData.data?.login;
+
+  const octokit = new Octokit({
+    auth: token,
+  });
+  const mergeResponse = await octokit?.request(
+    "PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge",
+    {
+      owner: owner,
+      repo: repo,
+      pull_number: pr,
       headers: {
-        Authorization: `token ${token}`,
+        "X-GitHub-Api-Version": "2022-11-28",
       },
-    })
-    .then(async (response) => {
-      const owner = response.data?.login;
-      const octokit = new Octokit({
-        auth: token,
-      });
-      await octokit
-        ?.request("PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge", {
-          owner: owner,
-          repo: repo,
-          pull_number: pr,
-          headers: {
-            'X-GitHub-Api-Version': '2022-11-28'
-          }
-        })
-        .then((response) => {
-          console.log("Pull Request merged successfully");
-        })
-        .catch((error) => {
-          if (error.response?.status === 401) {
-            console.log("Invalid token. Please install the bot again.");
-          }
-          console.log(error.response?.data?.message);
-        });
-    });
-};
+    }
+  );
+  if (mergeResponse.status != 200) {
+    console.log("Something went wrong in merging pull request.");
+    return;
+  }
+  console.log("Pull Request merged successfully");
+}
+
+export { mergePullRequest };
