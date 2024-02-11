@@ -8,21 +8,21 @@ const listOfPullRequest = async (repo) => {
     console.log("Token not found. Please install the bot first.");
     return;
   }
+
   const userData = await axios.get("https://api.github.com/user", {
     headers: {
       Authorization: `token ${token}`,
     },
   });
-  if (!userData) {
-    console.log("User not found. Please install the bot first.");
+  if(userData.status !== 200){
+    console.log(userData.data.message);
     return;
   }
   const owner = userData.data?.login;
 
   const octokit = new Octokit({
     auth: token,
-  });
-
+  }); 
   const pullRequestData = await octokit?.request(
     "GET /repos/{owner}/{repo}/pulls",
     {
@@ -33,6 +33,14 @@ const listOfPullRequest = async (repo) => {
       },
     }
   );
+  if (pullRequestData.status === 401 || userData.status === 401) {
+    console.log("Invalid token. Please install the bot again.");
+    return;
+  }else if(pullRequestData.status !== 200){
+    console.log("Something went wrong in fetching the pull requests.");
+    return; 
+  }
+  
   if (pullRequestData?.data?.length === 0) {
     console.log("No pull requests found");
     return;
@@ -46,11 +54,6 @@ const listOfPullRequest = async (repo) => {
     });
   });
   console.table(pullRequestDataArray);
-
-  if (pullRequestData.status === 401 || userData.status === 401) {
-    console.log("Invalid token. Please install the bot again.");
-    return;
-  }
 };
 
 export { listOfPullRequest };

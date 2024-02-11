@@ -69,6 +69,10 @@ function authorization() {
         },
       }
     );
+    if (!oauthResponse) {
+      console.log("Something went wrong in fetching the token.");
+      return;
+    }
 
     if (oauthResponse.data?.access_token) {
       saveTokenToFile(oauthResponse.data.access_token);
