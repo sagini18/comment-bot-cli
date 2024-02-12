@@ -1,5 +1,5 @@
-import { readTokenFromFile } from "./install.js";
 import axios from "axios";
+import { readTokenFromFile } from "../utils/handleToken.js";
 
 async function listOfRepositories() {
   const token = readTokenFromFile();

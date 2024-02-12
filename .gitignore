@@ -2,3 +2,4 @@ node_modules
 .env
 token.txt
 pr-comment-on-build.2024-01-28.private-key.pem
+error.log

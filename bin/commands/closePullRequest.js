@@ -1,6 +1,6 @@
 import { Octokit } from "@octokit/rest";
-import axios from "axios";
-import { readTokenFromFile } from "./install.js";
+import { readTokenFromFile } from "../utils/handleToken.js";
+import { getOwner } from "../utils/getOwner.js";
 
 async function closePullRequest(repo, pr) {
   const token = readTokenFromFile();
@@ -16,23 +16,6 @@ async function closePullRequest(repo, pr) {
   }
 
   closePullRequestUsingOctokit(owner, repo, pr, token);
-}
-
-async function getOwner(token) {
-  try {
-    const userData = await axios.get("https://api.github.com/user", {
-      headers: {
-        Authorization: `token ${token}`,
-      },
-    });
-    const owner = userData.data?.login;
-    return owner;
-  } catch (error) {
-    console.log(
-      "Error in fetching user data: ",
-      error?.response?.data?.message || error?.message
-    );
-  }
 }
 
 async function closePullRequestUsingOctokit(owner, repo, pr, token) {

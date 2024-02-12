@@ -1,25 +1,26 @@
 import { App } from "octokit";
 import axios from "axios";
-import { readTokenFromFile } from "./install.js";
 import fs from "fs";
 import { generateJWT } from "../utils/generateJWT.js";
+import { logger } from "../utils/logError.js";
+import { getOwner } from "../utils/getOwner.js";
 
 async function addComment(repo, pr, comment) {
   const owner = await getOwner();
   if (!owner) {
-    console.log("Owner not found.");
+    logger.error({message: "Owner noot found"})
     return;
   }
 
   const installationId = await getInstallationId(owner, repo);
   if (!installationId) {
-    console.log("Installation id not found.");
+    logger.error({message:"Installation id not found."});
     return;
   }
 
   const octokit = await getOctokit(installationId);
   if (!octokit) {
-    console.log("Octokit not found.");
+    logger.error({message:"Octokit not found."});
     return;
   }
 
@@ -33,33 +34,11 @@ async function addComment(repo, pr, comment) {
   handlePullRequestOpened(octokit, payload);
 }
 
-async function getOwner() {
-  const token = readTokenFromFile();
-  if (!token) {
-    console.log("Token not found. Please install the bot first.");
-    return;
-  }
-
-  try {
-    const userData = await axios.get("https://api.github.com/user", {
-      headers: {
-        Authorization: `token ${token}`,
-      },
-    });
-
-    const owner = userData.data?.login;
-    return owner;
-  } catch (error) {
-    console.log("Error in fetching user data:", error?.response?.data?.message);
-    return;
-  }
-}
-
 async function getInstallationId(owner, repo) {
   try {
     const jwtToken = generateJWT();
     if (!jwtToken) {
-      console.log("JWT token not found.");
+      logger.error({message:"JWT token not found."});
       return;
     }
 
@@ -75,10 +54,7 @@ async function getInstallationId(owner, repo) {
     const installationId = installationIdReponse.data?.id;
     return installationId;
   } catch (error) {
-    console.log(
-      "Error in fetching installation id:",
-      error?.response?.data?.message
-    );
+    logger.error({message:`Error in fetching installation id : ${error?.response?.data?.message}`});
     return;
   }
 }
@@ -98,14 +74,14 @@ async function getOctokit(installationId) {
     const octokit = await app.getInstallationOctokit(installationId);
     return octokit;
   } catch (error) {
-    console.log("Error in getting octokit:", error?.response?.data?.message);
+    logger.error({message:`Error in getting octokit : ${error?.response?.data?.message}`});
     return;
   }
 }
 
 async function handlePullRequestOpened(octokit, payload) {
   if (!octokit) {
-    console.log("Octokit not found.");
+    logger.error({message:"Octokit not found."});
     return;
   }
 
@@ -125,7 +101,7 @@ async function handlePullRequestOpened(octokit, payload) {
       commentsResponse?.data?.html_url
     );
   } catch (error) {
-    console.log("Error in adding comment:", error?.response?.data?.message);
+    logger.error({message:`Error in adding comment : ${error?.response?.data?.message}`});
     return;
   }
 }

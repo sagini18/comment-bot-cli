@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import fs from "fs";
+import { logger } from "./logError.js";
 
 export function generateJWT() {
   try {
@@ -15,7 +16,7 @@ export function generateJWT() {
     const jwtToken = jwt.sign(payload, privateKey, { algorithm: "RS256" });
     return jwtToken;
   } catch (err) {
-    console.log("Error in generating jwt: ", err.message);
+    logger.error(err.message);
     return;
   }
 }

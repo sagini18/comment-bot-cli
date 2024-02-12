@@ -26,6 +26,7 @@
     "jsonwebtoken": "^9.0.2",
     "octokit": "^3.1.2",
     "open": "^10.0.3",
-    "smee-client": "^2.0.1"
+    "smee-client": "^2.0.1",
+    "winston": "^3.11.0"
   }
 }

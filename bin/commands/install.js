@@ -1,7 +1,7 @@
 import axios from "axios";
 import express from "express";
 import open from "open";
-import fs from "fs";
+import { saveTokenToFile } from "../utils/handleToken.js";
 
 const app = express();
 let serverInstance;
@@ -84,11 +84,6 @@ function authorization() {
     }
   });
 }
-function saveTokenToFile(token) {
-  fs.writeFileSync("token.txt", token, "utf-8");
-}
-function readTokenFromFile() {
-  return fs.readFileSync("token.txt", "utf-8");
-}
 
-export { install, readTokenFromFile };
+
+export { install };
