@@ -9,41 +9,65 @@ async function addPullRequest(repo, title, body, head, base) {
     return;
   }
 
-  const userData = await axios.get("https://api.github.com/user", {
-    headers: {
-      Authorization: `token ${token}`,
-    },
-  });
-  if (userData.status != 200) {
-    console.log("Something went wrong in fetching user data.");
-    return;
-  }
-  const owner = userData.data?.login;
-
-  const octokit = new Octokit({
-    auth: token,
-  });
-
-  const addprResponse = await octokit?.request(
-    "POST /repos/{owner}/{repo}/pulls",
-    {
-      owner,
-      repo,
-      title,
-      body,
-      head,
-      base,
-    }
-  );
-  if (addprResponse.status != 201) {
-    console.log("Something went wrong in adding pull request.");
+  const owner = await getOwner(token);
+  if (!owner) {
+    console.log("Owner not found.");
     return;
   }
 
-  console.log(
-    "Pull Request added successfully\nView the pull request at:\n",
-    addprResponse.data.html_url
-  );
+  addPullRequestToRepo(owner, repo, title, body, head, base, token);
+}
+
+async function getOwner(token) {
+  try {
+    const userData = await axios.get("https://api.github.com/user", {
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    });
+    const owner = userData.data?.login;
+    return owner;
+  } catch (error) {
+    console.log("Error in fetching user data:", error?.response?.data?.message || error?.message);
+    return;
+  }
+}
+
+async function addPullRequestToRepo(
+  owner,
+  repo,
+  title,
+  body,
+  head,
+  base,
+  token
+) {
+  try {
+    const octokit = new Octokit({
+      auth: token,
+    });
+    const addprResponse = await octokit?.request(
+      "POST /repos/{owner}/{repo}/pulls",
+      {
+        owner,
+        repo,
+        title,
+        body,
+        head,
+        base,
+      }
+    );
+    console.log(
+      "Pull Request added successfully\nView the pull request at:\n",
+      addprResponse.data?.html_url
+    );
+  } catch (error) {
+    console.log(
+      "Error in adding pull request:",
+      error?.response?.data?.message || error?.message
+    );
+    return;
+  }
 }
 
 export { addPullRequest };
