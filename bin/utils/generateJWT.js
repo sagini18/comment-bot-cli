@@ -17,6 +17,5 @@ export function generateJWT() {
     return jwtToken;
   } catch (err) {
     logger.error(err.message);
-    return;
   }
 }

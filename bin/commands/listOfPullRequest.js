@@ -1,21 +1,26 @@
 import { Octokit } from "@octokit/rest";
 import { readTokenFromFile } from "../utils/handleToken.js";
 import { getOwner } from "../utils/getOwner.js";
+import { logger } from "../utils/logError.js";
 
 const listOfPullRequest = async (repo) => {
+  try{
   const token = readTokenFromFile();
   if (!token) {
-    console.log("Token not found. Please install the bot first.");
-    return;
+    throw new Error("Token not found. Please install the bot first.");
   }
 
-  const owner = await getOwner(token);
+  const owner = await getOwner();
   if (!owner) {
-    console.log("Owner not found");
-    return;
+    throw new Error("Owner not found");
   }
 
   getPullRequest(owner, repo, token);
+  }catch(error){
+    logger.error({
+      message: `Error in fetching pull request : ${error?.message}`,
+    });
+  }
 };
 
 async function getPullRequest(owner, repo, token) {
@@ -35,7 +40,7 @@ async function getPullRequest(owner, repo, token) {
     );
 
     if (pullRequestData?.data?.length === 0) {
-      console.log("No pull requests found");
+      logger.info("No pull requests found");
       return;
     }
     var pullRequestDataArray = [];
@@ -48,10 +53,11 @@ async function getPullRequest(owner, repo, token) {
     });
     console.table(pullRequestDataArray);
   } catch (error) {
-    console.log(
-      "Error in fetching PR: ",
-      error?.response?.data?.message || error?.message
-    );
+    logger.error({
+      message: `Error in fetching pull request : ${
+        error?.response?.data?.message || error?.message
+      }`,
+    });
   }
 }
 

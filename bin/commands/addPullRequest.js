@@ -1,21 +1,26 @@
 import { Octokit } from "@octokit/rest";
 import { readTokenFromFile } from "../utils/handleToken.js";
 import { getOwner } from "../utils/getOwner.js";
+import { logger } from "../utils/logError.js";
 
 async function addPullRequest(repo, title, body, head, base) {
-  const token = readTokenFromFile();
-  if (!token) {
-    console.log("Token not found. Please install the bot first.");
-    return;
-  }
+  try {
+    const token = readTokenFromFile();
+    if (!token) {
+      throw new Error("Token not found. Please install the bot first.");
+    }
 
-  const owner = await getOwner(token);
-  if (!owner) {
-    console.log("Owner not found.");
-    return;
-  }
+    const owner = await getOwner();
+    if (!owner) {
+      throw new Error("Owner not found.");
+    }
 
-  addPullRequestToRepo(owner, repo, title, body, head, base, token);
+    addPullRequestToRepo(owner, repo, title, body, head, base, token);
+  } catch (error) {
+    logger.error({
+      message: `Error in adding pull request : ${error?.message}`,
+    });
+  }
 }
 
 async function addPullRequestToRepo(
@@ -42,15 +47,15 @@ async function addPullRequestToRepo(
         base,
       }
     );
-    console.log(
-      "Pull Request added successfully\nView the pull request at:\n",
-      addprResponse.data?.html_url
+    logger.info(
+      `Pull Request added successfully\nView the pull request at:\n ${addprResponse.data?.html_url}`
     );
   } catch (error) {
-    console.log(
-      "Error in adding pull request:",
-      error?.response?.data?.message || error?.message
-    );
+    logger.error({
+      message: `Error in adding pull request : ${
+        error?.response?.data?.message || error?.message
+      }`,
+    });
     return;
   }
 }

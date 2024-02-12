@@ -5,8 +5,7 @@ import { readTokenFromFile } from "./handleToken.js";
 export async function getOwner(){
     const token = readTokenFromFile();
     if (!token) {
-      logger.error({message:"Token not found. Please install the app first."});
-      return;
+      throw new Error("Token not found. Please install the bot first.");
     }
   
     try {
@@ -20,6 +19,5 @@ export async function getOwner(){
       return owner;
     } catch (error) {
       logger.error({message:`Error in fetching user data : ${error?.response?.data?.message}`});
-      return;
     }
 };

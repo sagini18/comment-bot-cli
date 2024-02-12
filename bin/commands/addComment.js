@@ -6,40 +6,44 @@ import { logger } from "../utils/logError.js";
 import { getOwner } from "../utils/getOwner.js";
 
 async function addComment(repo, pr, comment) {
-  const owner = await getOwner();
-  if (!owner) {
-    logger.error({message: "Owner noot found"})
-    return;
+  try {
+    const owner = await getOwner();
+    if (!owner) {
+      throw new Error("Owner noot found");
+    }
+
+    const installationId = await getInstallationId(owner, repo);
+    if (!installationId) {
+      throw new Error("Installation id not found.");
+    }
+
+    const octokit = await getOctokit(installationId);
+    if (!octokit) {
+      throw new Error("Octokit not found.");
+    }
+
+    const payload = {
+      owner,
+      repo,
+      pr_number: pr,
+      comment,
+    };
+
+    handleAddComment(octokit, payload);
+  } catch (error) {
+    logger.error({
+      message: `Error in adding comment : ${
+        error?.response?.data?.message || error?.message
+      }`,
+    });
   }
-
-  const installationId = await getInstallationId(owner, repo);
-  if (!installationId) {
-    logger.error({message:"Installation id not found."});
-    return;
-  }
-
-  const octokit = await getOctokit(installationId);
-  if (!octokit) {
-    logger.error({message:"Octokit not found."});
-    return;
-  }
-
-  const payload = {
-    owner,
-    repo,
-    pr_number: pr,
-    comment,
-  };
-
-  handlePullRequestOpened(octokit, payload);
 }
 
 async function getInstallationId(owner, repo) {
   try {
     const jwtToken = generateJWT();
     if (!jwtToken) {
-      logger.error({message:"JWT token not found."});
-      return;
+      throw new Error("JWT token not found.");
     }
 
     const installationIdReponse = await axios.get(
@@ -54,8 +58,11 @@ async function getInstallationId(owner, repo) {
     const installationId = installationIdReponse.data?.id;
     return installationId;
   } catch (error) {
-    logger.error({message:`Error in fetching installation id : ${error?.response?.data?.message}`});
-    return;
+    logger.error({
+      message: `Error in fetching installation id : ${
+        error?.response?.data?.message || error?.message
+      }`,
+    });
   }
 }
 
@@ -72,17 +79,22 @@ async function getOctokit(installationId) {
     });
 
     const octokit = await app.getInstallationOctokit(installationId);
+    if (!octokit) {
+      throw new Error("Octokit not found.");
+    }
     return octokit;
   } catch (error) {
-    logger.error({message:`Error in getting octokit : ${error?.response?.data?.message}`});
-    return;
+    logger.error({
+      message: `Error in getting octokit : ${
+        error?.response?.data?.message || error?.message
+      }`,
+    });
   }
 }
 
-async function handlePullRequestOpened(octokit, payload) {
+async function handleAddComment(octokit, payload) {
   if (!octokit) {
-    logger.error({message:"Octokit not found."});
-    return;
+    throw new Error("Octokit not found.");
   }
 
   try {
@@ -96,13 +108,13 @@ async function handlePullRequestOpened(octokit, payload) {
       }
     );
 
-    console.log(
-      "Comment added successfully\nView the comment at:\n",
-      commentsResponse?.data?.html_url
-    );
+    logger.info(`Comment added successfully\nView the comment at:\n${commentsResponse?.data?.html_url}`);
   } catch (error) {
-    logger.error({message:`Error in adding comment : ${error?.response?.data?.message}`});
-    return;
+    logger.error({
+      message: `Error in adding comment : ${
+        error?.response?.data?.message || error?.message
+      }`,
+    });
   }
 }
 
