@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import { program } from "commander";
-import { install } from "./utils/install.js";
-import { listOfRepositories } from "./utils/listOfRepositories.js";
-import { listOfPullRequest } from "./utils/listOfPullRequest.js";
-import { addComment } from "./utils/addComment.js";
-import { addPullRequest } from "./utils/addPullRequest.js";
-import { closePullRequest } from "./utils/closePullRequest.js";
-import { mergePullRequest } from "./utils/mergePullRequest.js";
-import { reopenPullRequest } from "./utils/reopenPullRequest.js";
+import { install } from "./commands/install.js";
+import { listOfRepositories } from "./commands/listOfRepositories.js";
+import { listOfPullRequest } from "./commands/listOfPullRequest.js";
+import { addComment } from "./commands/addComment.js";
+import { addPullRequest } from "./commands/addPullRequest.js";
+import { closePullRequest } from "./commands/closePullRequest.js";
+import { mergePullRequest } from "./commands/mergePullRequest.js";
+import { reopenPullRequest } from "./commands/reopenPullRequest.js";
 import dotenv from "dotenv";
 dotenv.config();
 
