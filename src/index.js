@@ -30,8 +30,9 @@ program
   .requiredOption("-r, --repo <repo>", "The repository to add the comment to.")
   .requiredOption("-p, --pr <pr>", "The pull request to add the comment to.")
   .requiredOption("-c, --comment <comment>", "The comment to be added.")
-  .action(({ repo, pr, comment }) =>
-    addComment(repo, pr, comment)
+  .option("-l, --label <label>", "The choreo build label to be added.")
+  .action(({ repo, pr, comment, label }) =>
+    addComment(repo, pr, comment, label)
   );
 
 program
