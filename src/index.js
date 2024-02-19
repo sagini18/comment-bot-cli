@@ -30,54 +30,37 @@ program
   .requiredOption("-r, --repo <repo>", "The repository to add the comment to.")
   .requiredOption("-p, --pr <pr>", "The pull request to add the comment to.")
   .requiredOption("-c, --comment <comment>", "The comment to be added.")
-  .option("-l, --label <label>", "The choreo build label to be added.")
-  .action(({ repo, pr, comment, label }) =>
-    addComment(repo, pr, comment, label)
-  );
+  .action(({repo, pr, comment}) => addComment(repo, pr, comment));
 
 program
   .command("addpr")
   .description("Add a pull request to a repository")
-  .requiredOption(
-    "-r, --repo <repo>",
-    "The repository to add the pull request to."
-  )
+  .requiredOption("-r, --repo <repo>", "The repository to add the pull request to.")
   .requiredOption("-t, --title <title>", "The title of the pull request.")
   .requiredOption("-bo, --body <body>", "The body of the pull request.")
   .requiredOption("-he, --head <head>", "The head of the pull request.")
   .requiredOption("-ba, --base <base>", "The base of the pull request.")
-  .action(({ repo, title, body, head, base }) =>
-    addPullRequest(repo, title, body, head, base)
-  );
+  .action(({repo, title, body, head, base}) => addPullRequest(repo, title, body, head, base));
 
 program
   .command("closepr")
   .description("Close a pull request.")
-  .requiredOption(
-    "-r, --repo <repo>",
-    "The repository to close the pull request."
-  )
+  .requiredOption("-r, --repo <repo>", "The repository to close the pull request.")
   .requiredOption("-p, --pr <pr>", "The pull request to be closed.")
-  .action(({ repo, pr }) => closePullRequest(repo, pr));
+  .action(({repo,pr})=>closePullRequest(repo,pr));
 
 program
   .command("mergepr")
   .description("Merge a pull request.")
-  .requiredOption(
-    "-r, --repo <repo>",
-    "The repository to merge the pull request."
-  )
+  .requiredOption("-r, --repo <repo>", "The repository to merge the pull request.")
   .requiredOption("-p, --pr <pr>", "The pull request to be merged.")
-  .action(({ repo, pr }) => mergePullRequest(repo, pr));
+  .action(({repo,pr})=>mergePullRequest(repo,pr));
 
 program
   .command("reopenpr")
   .description("Reopen a pull request.")
-  .requiredOption(
-    "-r, --repo <repo>",
-    "The repository to reopen the pull request."
-  )
+  .requiredOption("-r, --repo <repo>", "The repository to reopen the pull request.")
   .requiredOption("-p, --pr <pr>", "The pull request to be reopened.")
-  .action(({ repo, pr }) => reopenPullRequest(repo, pr));
+  .action(({repo,pr})=>reopenPullRequest(repo,pr));
 
 program.parse(process.argv);
