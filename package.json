@@ -1,11 +1,11 @@
 {
   "name": "prcommentorcli",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "build": "node src/index.js && your-build-command",    
+    "build": "node src/index.js && your-build-command",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
