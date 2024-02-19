@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
+    "build": "node src/index.js && your-build-command",    
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -21,11 +22,13 @@
     "@octokit/rest": "^20.0.2",
     "axios": "^1.6.7",
     "commander": "^12.0.0",
-    "dotenv": "^16.4.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "octokit": "^3.1.2",
     "open": "^10.0.3",
     "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.4"
   }
 }
